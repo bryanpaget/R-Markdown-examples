@@ -1,0 +1,148 @@
+# Example
+
+The following example does some basic plotting with R.
+
+## Basic Code Expressions
+
+Here is an example of inline code: 2 + 2 = `r 2 + 2`
+
+Here is an example R codeblock with `echo=TRUE` (the default):
+
+```{r}
+2 + 2
+```
+
+Here is the same example R codeblock but with `echo=FALSE`:
+
+```{r echo=FALSE}
+2 + 2
+```
+
+Here is a sample of plotting data:
+
+```{r}
+head(cars)
+plot(cars, xlab = "Speed (mph)", ylab = "Stopping distance (ft)", las = 1)
+```
+
+Finally, variables declared in one code block:
+
+```{r}
+x = 12
+```
+
+... can be referenced in another:
+
+```{r}
+x
+```
+
+This allows you to explain your analysis as you build it.
+
+
+## Simple Analysis Example
+
+For the followig analysis, we want to explore the `iris` package:
+
+```{r}
+head(iris)
+```
+
+Let's look at a plot of the data color-coded by species:
+
+```{r}
+plot(iris, col=iris$Species)
+```
+
+Finally, let's look at some scatterplots of the data (taken from a [question on Stack Overflow](http://stats.stackexchange.com/questions/30788/whats-a-good-way-to-use-r-to-make-a-scatterplot-that-separates-the-data-by-trea)):
+
+Load the `ggplot` library:
+
+```{r}
+library(ggplot2)
+```
+
+Using this, we can see the data clustered by species:
+
+```{r}
+ggplot(iris, aes (x=Sepal.Length, y=Sepal.Width, colour=Species)) + stat_density2d()
+```
+
+And, as a reminder, if you didn't want your R code to be displayed when showing any part of this, you could simple include `echo=FALSE` in the `{r}` directives. This allows you to build up a complex series of instructions and just display the final output (the following is copied shamelessly from [Getting Fancy with 3-D Scatterplots](http://www.r-bloggers.com/getting-fancy-with-3-d-scatterplots/)).
+
+Here's a 3-D scatterplot:
+
+```{r echo=FALSE}
+library(scatterplot3d)
+
+with(mtcars, {
+   scatterplot3d(disp,   # x axis
+                 wt,     # y axis
+                 mpg,    # z axis
+                 main="3-D Scatterplot Example 1")
+})
+```
+
+Here's the same scatterplot with vertical lines to help visualize the (X,Y) portions of the coordinates:
+
+```{r echo=FALSE}
+with(mtcars, {
+   scatterplot3d(disp, wt, mpg,        # x y and z axis
+                 color="blue", pch=19, # filled blue circles
+                 type="h",             # lines to the horizontal plane
+                 main="3-D Scatterplot Example 2",
+                 xlab="Displacement (cu. in.)",
+                 ylab="Weight (lb/1000)",
+                 zlab="Miles/(US) Gallon")
+})
+```
+
+Here's the same scatterplot with points labeled:
+
+```{r echo=FALSE}
+with(mtcars, {
+   s3d <- scatterplot3d(disp, wt, mpg,        # x y and z axis
+                 color="blue", pch=19,        # filled blue circles
+                 type="h",                    # vertical lines to the x-y plane
+                 main="3-D Scatterplot Example 3",
+                 xlab="Displacement (cu. in.)",
+                 ylab="Weight (lb/1000)",
+                 zlab="Miles/(US) Gallon")
+    s3d.coords <- s3d$xyz.convert(disp, wt, mpg) # convert 3D coords to 2D projection
+    text(s3d.coords$x, s3d.coords$y,             # x and y coordinates
+         labels=row.names(mtcars),               # text to plot
+         cex=.5, pos=4)           # shrink text 50% and place to right of points)
+})
+```
+
+And here's the same scatterplot with color-coding by class:
+
+```{r echo=FALSE}
+# create column indicating point color
+mtcars$pcolor[mtcars$cyl==4] <- "red"
+mtcars$pcolor[mtcars$cyl==6] <- "blue"
+mtcars$pcolor[mtcars$cyl==8] <- "darkgreen"
+with(mtcars, {
+    s3d <- scatterplot3d(disp, wt, mpg,        # x y and z axis
+                  color=pcolor, pch=19,        # circle color indicates no. of cylinders
+                  type="h", lty.hplot=2,       # lines to the horizontal plane
+                  scale.y=.75,                 # scale y axis (reduce by 25%)
+                  main="3-D Scatterplot Example 4",
+                  xlab="Displacement (cu. in.)",
+                  ylab="Weight (lb/1000)",
+                  zlab="Miles/(US) Gallon")
+     s3d.coords <- s3d$xyz.convert(disp, wt, mpg)
+     text(s3d.coords$x, s3d.coords$y,     # x and y coordinates
+          labels=row.names(mtcars),       # text to plot
+          pos=4, cex=.5)                  # shrink text 50% and place to right of points)
+# add the legend
+legend("topleft", inset=.05,      # location and inset
+    bty="n", cex=.5,              # suppress legend box, shrink text 50%
+    title="Number of Cylinders",
+    c("4", "6", "8"), fill=c("red", "blue", "darkgreen"))
+})
+```
+
+## Conclusion
+
+The combination of R and Markdown makes for a very powerful report tool.
